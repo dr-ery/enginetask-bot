@@ -13,7 +13,7 @@ const cron     = require('node-cron');
 const express  = require('express');
 
 // ─── Firebase Admin Init ─────────────────────────────────────────
-const serviceAccount = require('./serviceAccountKey.json'); // download from Firebase Console
+const serviceAccount = require('/etc/secrets/serviceAccountKey.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -206,10 +206,9 @@ function startReminderCron() {
 }
 
 // ─── Self-ping to prevent Render.com sleep ───────────────────────
-if (process.env.RENDER_EXTERNAL_URL) {
+if (process.env.RENDER_EXTERNAL_URL || true) {
+  const pingUrl = process.env.RENDER_EXTERNAL_URL || 'https://enginetask-bot.onrender.com';
   setInterval(async () => {
-    try {
-      await fetch(`${process.env.RENDER_EXTERNAL_URL}/ping`);
-    } catch {}
-  }, 10 * 60 * 1000); // every 10 minutes
+    try { await fetch(`${pingUrl}/ping`); } catch {}
+  }, 10 * 60 * 1000);
 }

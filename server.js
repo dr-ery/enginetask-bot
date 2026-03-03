@@ -30,10 +30,17 @@ app.listen(process.env.PORT || 3001, () => {
 
 // ─── Find Chrome ─────────────────────────────────────────────────
 function findChrome() {
-  const matches = glob.sync('/opt/render/.cache/puppeteer/chrome/linux-*/chrome-linux64/chrome');
-  if (matches.length) { console.log('[CHROME] Found:', matches[0]); return matches[0]; }
-  console.log('[CHROME] Using system default');
-  return undefined;
+  try {
+    const puppeteer = require('puppeteer');
+    const path = puppeteer.executablePath();
+    console.log('[CHROME] Found:', path);
+    return path;
+  } catch(e) {
+    console.log('[CHROME] Fallback to glob');
+    const matches = glob.sync('/opt/render/.cache/puppeteer/chrome/linux-*/chrome-linux64/chrome');
+    if (matches.length) { console.log('[CHROME]', matches[0]); return matches[0]; }
+    return undefined;
+  }
 }
 
 // ─── WhatsApp Client ─────────────────────────────────────────────
